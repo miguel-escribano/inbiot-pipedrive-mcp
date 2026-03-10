@@ -83,23 +83,26 @@ All other configurations you see in the .env file are optional and can be left a
 **For the company domain:**
 If your Pipedrive URL is `https://mycompany.pipedrive.com/pipeline`, then your domain is `mycompany`
 
-### 4b. Client credentials over HTTP/SSE (optional)
+### 4b. Client credentials over HTTP/SSE (remote / Cursor)
 
-When the MCP server is reached over HTTP/SSE (e.g. by URL from Cursor or another client), you can supply Pipedrive credentials from the client so they never need to be stored on the server. Send these HTTP headers on each request:
+When the MCP server is reached over HTTP/SSE (e.g. by URL from Cursor or another client), **credentials must be sent via HTTP headers**; the server does not use env-based credentials for those requests. All secrets stay in the client (e.g. `mcp.json`).
+
+Send these HTTP headers on every request:
 
 - `X-Pipedrive-API-Token` – your Pipedrive API token
-- `X-Pipedrive-Company-Domain` – your company subdomain (e.g. `mycompany`)
+- `X-Pipedrive-Company-Domain` – your company subdomain only (e.g. from `https://inbiotmonitoringsl.pipedrive.com/` use `inbiotmonitoringsl`)
 
-If both headers are present and valid, the server uses them for that session and does not require `PIPEDRIVE_API_TOKEN` or `PIPEDRIVE_COMPANY_DOMAIN` in the server environment. If either header is missing, the server falls back to env-based config (see above).
+The deployment must forward these headers from the client to the Python app and must **not** set `PIPEDRIVE_API_TOKEN` or `PIPEDRIVE_COMPANY_DOMAIN` on the server for this service. See [docs/HEADER_ONLY_DEPLOY.md](docs/HEADER_ONLY_DEPLOY.md) for deploy requirements.
 
-**Example (Cursor):** If your client supports custom headers for an MCP entry, configure the remote server URL and add headers in your MCP config, for example:
+**Example (Cursor):** Use native remote with `url` and `headers`:
 
 ```json
 {
   "mcpServers": {
     "pipedrive": {
-      "url": "https://your-mcp-server.example.com/sse",
+      "url": "https://your-mcp-server.example.com/inbiot-pipedrive-mcp/sse",
       "headers": {
+        "X-MCP-Token": "your_mcp_auth_token",
         "X-Pipedrive-API-Token": "your_api_token",
         "X-Pipedrive-Company-Domain": "yourcompany"
       }
