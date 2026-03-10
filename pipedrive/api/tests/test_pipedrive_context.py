@@ -58,3 +58,23 @@ def test_get_pipedrive_context_uses_headers_when_both_present():
     assert result.pipedrive_client is not None
     assert result.pipedrive_client.base_client.api_token == "test_token_12345678901234567890"
     assert result.pipedrive_client.base_client.domain == "https://mycompany.pipedrive.com"
+
+
+def test_get_pipedrive_context_http_no_fallback_to_env():
+    """When request exists but headers missing/invalid, raise; do not use lifespan client."""
+    mock_client = MagicMock(spec=PipedriveClient)
+    mock_ctx = MagicMock()
+    mock_request = MagicMock()
+    mock_request.headers.get.side_effect = lambda k: ""  # no headers
+    mock_request.state = SimpleNamespace()
+    mock_ctx.request_context.request = mock_request
+    mock_ctx.request_context.lifespan_context = PipedriveMCPContext(
+        pipedrive_client=mock_client
+    )
+
+    with pytest.raises(ValueError) as excinfo:
+        get_pipedrive_context(mock_ctx)
+
+    assert "X-Pipedrive-API-Token" in str(excinfo.value)
+    assert "X-Pipedrive-Company-Domain" in str(excinfo.value)
+    assert "no server-side fallback" in str(excinfo.value)

@@ -26,9 +26,10 @@ class PipedriveMCPContext:
 def get_pipedrive_context(ctx: Context) -> PipedriveMCPContext:
     """
     Resolve Pipedrive client for this request/session.
-    When the server is used over HTTP/SSE, if both X-Pipedrive-API-Token and
-    X-Pipedrive-Company-Domain are present on the request, they are used (client credentials).
-    Otherwise the env-based client from lifespan is used.
+    - Over HTTP/SSE: credentials come only from request headers (X-Pipedrive-API-Token,
+      X-Pipedrive-Company-Domain). No fallback to server env so that all secrets stay in
+      the client (e.g. mcp.json).
+    - Over stdio: use env-based client from lifespan if available.
     """
     request = getattr(ctx.request_context, "request", None)
     lifespan_ctx = ctx.request_context.lifespan_context
@@ -59,13 +60,18 @@ def get_pipedrive_context(ctx: Context) -> PipedriveMCPContext:
                     pass
             if client is not None:
                 return PipedriveMCPContext(pipedrive_client=client)
+        raise ValueError(
+            "Pipedrive credentials over HTTP/SSE must be sent via headers: "
+            "X-Pipedrive-API-Token and X-Pipedrive-Company-Domain (no server-side fallback)."
+        )
 
     if default_client is not None:
         return PipedriveMCPContext(pipedrive_client=default_client)
 
     raise ValueError(
-        "Pipedrive credentials are required. Set PIPEDRIVE_API_TOKEN and PIPEDRIVE_COMPANY_DOMAIN "
-        "on the server, or when using HTTP/SSE send X-Pipedrive-API-Token and X-Pipedrive-Company-Domain headers."
+        "Pipedrive credentials are required. For stdio: set PIPEDRIVE_API_TOKEN and "
+        "PIPEDRIVE_COMPANY_DOMAIN in the environment. For HTTP/SSE: send "
+        "X-Pipedrive-API-Token and X-Pipedrive-Company-Domain headers."
     )
 
 
