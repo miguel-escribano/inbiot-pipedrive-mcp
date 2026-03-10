@@ -6,7 +6,7 @@ from log_config import logger
 from pipedrive.api.features.shared.conversion.id_conversion import convert_id_string
 from pipedrive.api.features.shared.utils import format_tool_response, safe_split_to_list
 from pipedrive.api.pipedrive_api_error import PipedriveAPIError
-from pipedrive.api.pipedrive_context import PipedriveMCPContext
+from pipedrive.api.pipedrive_context import PipedriveMCPContext, get_pipedrive_context
 from pipedrive.api.features.tool_decorator import tool
 
 
@@ -70,7 +70,7 @@ async def search_organizations_in_pipedrive(
         logger.error(error_message)
         return format_tool_response(False, error_message=error_message)
 
-    pd_mcp_ctx: PipedriveMCPContext = ctx.request_context.lifespan_context
+    pd_mcp_ctx: PipedriveMCPContext = get_pipedrive_context(ctx)
 
     limit, limit_error = convert_id_string(limit_str, "limit")
     if limit_error:

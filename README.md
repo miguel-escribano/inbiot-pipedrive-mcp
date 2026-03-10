@@ -83,6 +83,33 @@ All other configurations you see in the .env file are optional and can be left a
 **For the company domain:**
 If your Pipedrive URL is `https://mycompany.pipedrive.com/pipeline`, then your domain is `mycompany`
 
+### 4b. Client credentials over HTTP/SSE (optional)
+
+When the MCP server is reached over HTTP/SSE (e.g. by URL from Cursor or another client), you can supply Pipedrive credentials from the client so they never need to be stored on the server. Send these HTTP headers on each request:
+
+- `X-Pipedrive-API-Token` – your Pipedrive API token
+- `X-Pipedrive-Company-Domain` – your company subdomain (e.g. `mycompany`)
+
+If both headers are present and valid, the server uses them for that session and does not require `PIPEDRIVE_API_TOKEN` or `PIPEDRIVE_COMPANY_DOMAIN` in the server environment. If either header is missing, the server falls back to env-based config (see above).
+
+**Example (Cursor):** If your client supports custom headers for an MCP entry, configure the remote server URL and add headers in your MCP config, for example:
+
+```json
+{
+  "mcpServers": {
+    "pipedrive": {
+      "url": "https://your-mcp-server.example.com/sse",
+      "headers": {
+        "X-Pipedrive-API-Token": "your_api_token",
+        "X-Pipedrive-Company-Domain": "yourcompany"
+      }
+    }
+  }
+}
+```
+
+Credentials and tokens are never logged; the server logs only that client-supplied credentials are in use.
+
 ### 5. Install the MCP Server in Claude Desktop
 
 Open your terminal and run this command:

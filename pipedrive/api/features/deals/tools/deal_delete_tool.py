@@ -4,7 +4,7 @@ from log_config import logger
 from pipedrive.api.features.shared.conversion.id_conversion import convert_id_string
 from pipedrive.api.features.shared.utils import format_tool_response
 from pipedrive.api.pipedrive_api_error import PipedriveAPIError
-from pipedrive.api.pipedrive_context import PipedriveMCPContext
+from pipedrive.api.pipedrive_context import PipedriveMCPContext, get_pipedrive_context
 from pipedrive.api.features.tool_decorator import tool
 
 
@@ -44,7 +44,7 @@ async def delete_deal_from_pipedrive(
         f"id_str='{id_str}'"
     )
 
-    pd_mcp_ctx: PipedriveMCPContext = ctx.request_context.lifespan_context
+    pd_mcp_ctx: PipedriveMCPContext = get_pipedrive_context(ctx)
 
     # Convert string ID to integer
     deal_id, id_error = convert_id_string(id_str, "deal_id")

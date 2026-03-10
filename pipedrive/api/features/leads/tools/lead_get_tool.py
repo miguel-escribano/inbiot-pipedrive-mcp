@@ -8,7 +8,7 @@ from pipedrive.api.features.leads.models.lead import Lead
 from pipedrive.api.features.shared.conversion.id_conversion import validate_uuid_string
 from pipedrive.api.features.shared.utils import format_tool_response
 from pipedrive.api.pipedrive_api_error import PipedriveAPIError
-from pipedrive.api.pipedrive_context import PipedriveMCPContext
+from pipedrive.api.pipedrive_context import PipedriveMCPContext, get_pipedrive_context
 from pipedrive.api.features.tool_decorator import tool
 
 
@@ -58,7 +58,7 @@ async def get_lead_from_pipedrive(
     
     try:
         # Use the Pipedrive client from the context
-        pd_mcp_ctx: PipedriveMCPContext = ctx.request_context.lifespan_context
+        pd_mcp_ctx: PipedriveMCPContext = get_pipedrive_context(ctx)
         client = pd_mcp_ctx.pipedrive_client
         
         try:

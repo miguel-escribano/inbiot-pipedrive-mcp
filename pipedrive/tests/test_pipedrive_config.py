@@ -216,3 +216,43 @@ class TestPipedriveSettings:
         assert settings.verify_ssl is True
         assert settings.log_requests is False
         assert settings.log_responses is False
+
+    def test_from_headers_valid(self):
+        """Test from_headers with valid token and domain."""
+        settings = PipedriveSettings.from_headers(
+            "test_token_12345678901234567890", "mycompany"
+        )
+        assert settings.api_token == "test_token_12345678901234567890"
+        assert settings.company_domain == "mycompany"
+        assert settings.api_url == "https://mycompany.pipedrive.com/api/v2"
+
+    def test_from_headers_validation(self):
+        """Test from_headers uses same validation as model."""
+        with pytest.raises(ValidationError) as excinfo:
+            PipedriveSettings.from_headers("short", "mycompany")
+        assert "API token" in str(excinfo.value)
+        with pytest.raises(ValidationError) as excinfo:
+            PipedriveSettings.from_headers(
+                "test_token_12345678901234567890", "mycompany.pipedrive.com"
+            )
+        assert "Company domain" in str(excinfo.value)
+
+    @patch.dict(os.environ, {}, clear=True)
+    def test_from_env_optional_returns_none_when_empty(self):
+        """Test from_env_optional returns None when token/domain not set."""
+        result = PipedriveSettings.from_env_optional()
+        assert result is None
+
+    @patch.dict(
+        os.environ,
+        {
+            "PIPEDRIVE_API_TOKEN": "test_token_12345678901234567890",
+            "PIPEDRIVE_COMPANY_DOMAIN": "envtestcompany",
+        },
+    )
+    def test_from_env_optional_returns_settings_when_set(self):
+        """Test from_env_optional returns settings when env is valid."""
+        result = PipedriveSettings.from_env_optional()
+        assert result is not None
+        assert result.api_token == "test_token_12345678901234567890"
+        assert result.company_domain == "envtestcompany"

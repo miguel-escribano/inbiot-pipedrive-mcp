@@ -8,7 +8,7 @@ from pipedrive.api.features.activities.models.activity_type import ActivityType
 from pipedrive.api.features.shared.conversion.id_conversion import convert_id_string
 from pipedrive.api.features.shared.utils import format_tool_response, sanitize_inputs
 from pipedrive.api.pipedrive_api_error import PipedriveAPIError
-from pipedrive.api.pipedrive_context import PipedriveMCPContext
+from pipedrive.api.pipedrive_context import PipedriveMCPContext, get_pipedrive_context
 from pipedrive.api.features.tool_decorator import tool
 
 
@@ -68,7 +68,7 @@ async def create_activity_type_in_pipedrive(
     color = sanitized["color"]
     order_nr_str = sanitized["order_nr"]
     
-    pd_mcp_ctx: PipedriveMCPContext = ctx.request_context.lifespan_context
+    pd_mcp_ctx: PipedriveMCPContext = get_pipedrive_context(ctx)
     
     # Validate required parameters
     if not name:

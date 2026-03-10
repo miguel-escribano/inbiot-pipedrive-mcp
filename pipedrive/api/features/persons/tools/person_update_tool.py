@@ -9,7 +9,7 @@ from pipedrive.api.features.shared.conversion.id_conversion import convert_id_st
 from pipedrive.api.features.persons.models.person import Person
 from pipedrive.api.features.persons.models.contact_info import Email, Phone
 from pipedrive.api.pipedrive_api_error import PipedriveAPIError
-from pipedrive.api.pipedrive_context import PipedriveMCPContext
+from pipedrive.api.pipedrive_context import PipedriveMCPContext, get_pipedrive_context
 from pipedrive.api.features.tool_decorator import tool
 
 
@@ -83,7 +83,7 @@ async def update_person_in_pipedrive(
         f"custom_fields_str='{custom_fields_str}'"
     )
 
-    pd_mcp_ctx: PipedriveMCPContext = ctx.request_context.lifespan_context
+    pd_mcp_ctx: PipedriveMCPContext = get_pipedrive_context(ctx)
 
     # Verify that person ID is provided
     if not id_str:

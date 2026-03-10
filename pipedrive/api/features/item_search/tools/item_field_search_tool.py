@@ -6,7 +6,7 @@ from log_config import logger
 from pipedrive.api.features.item_search.models.search_result import FieldSearchResults
 from pipedrive.api.features.shared.utils import format_tool_response, safe_split_to_list, sanitize_inputs
 from pipedrive.api.pipedrive_api_error import PipedriveAPIError
-from pipedrive.api.pipedrive_context import PipedriveMCPContext
+from pipedrive.api.pipedrive_context import PipedriveMCPContext, get_pipedrive_context
 from pipedrive.api.features.tool_decorator import tool
 
 
@@ -147,7 +147,7 @@ async def search_item_field_in_pipedrive(
         logger.error(error_msg)
         return format_tool_response(False, error_message=error_msg)
 
-    pd_mcp_ctx: PipedriveMCPContext = ctx.request_context.lifespan_context
+    pd_mcp_ctx: PipedriveMCPContext = get_pipedrive_context(ctx)
     
     # Validate entity_type
     valid_entity_types = ["deal", "person", "organization", "product", "lead", "project"]

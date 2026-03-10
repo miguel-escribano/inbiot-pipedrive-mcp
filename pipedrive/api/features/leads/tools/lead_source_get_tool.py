@@ -5,7 +5,7 @@ from mcp.server.fastmcp import Context
 from log_config import logger
 from pipedrive.api.features.shared.utils import format_tool_response
 from pipedrive.api.pipedrive_api_error import PipedriveAPIError
-from pipedrive.api.pipedrive_context import PipedriveMCPContext
+from pipedrive.api.pipedrive_context import PipedriveMCPContext, get_pipedrive_context
 from pipedrive.api.features.tool_decorator import tool
 
 
@@ -35,7 +35,7 @@ async def get_lead_sources_from_pipedrive(ctx: Context) -> str:
     
     try:
         # Use the Pipedrive client from the context
-        pd_mcp_ctx: PipedriveMCPContext = ctx.request_context.lifespan_context
+        pd_mcp_ctx: PipedriveMCPContext = get_pipedrive_context(ctx)
         client = pd_mcp_ctx.pipedrive_client
         
         try:

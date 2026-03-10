@@ -3,7 +3,7 @@ from mcp.server.fastmcp import Context
 from log_config import logger
 from pipedrive.api.features.shared.utils import format_tool_response
 from pipedrive.api.pipedrive_api_error import PipedriveAPIError
-from pipedrive.api.pipedrive_context import PipedriveMCPContext
+from pipedrive.api.pipedrive_context import PipedriveMCPContext, get_pipedrive_context
 from pipedrive.api.features.tool_decorator import tool
 
 
@@ -31,7 +31,7 @@ async def get_activity_types_from_pipedrive(
     """
     logger.info("Tool 'get_activity_types_from_pipedrive' ENTERED")
     
-    pd_mcp_ctx: PipedriveMCPContext = ctx.request_context.lifespan_context
+    pd_mcp_ctx: PipedriveMCPContext = get_pipedrive_context(ctx)
     
     try:
         # Call the Pipedrive API to get activity types

@@ -8,7 +8,7 @@ from pipedrive.api.features.organizations.models.organization import Organizatio
 from pipedrive.api.features.shared.conversion.id_conversion import convert_id_string
 from pipedrive.api.features.shared.utils import format_tool_response, safe_split_to_list
 from pipedrive.api.pipedrive_api_error import PipedriveAPIError
-from pipedrive.api.pipedrive_context import PipedriveMCPContext
+from pipedrive.api.pipedrive_context import PipedriveMCPContext, get_pipedrive_context
 from pipedrive.api.features.tool_decorator import tool
 
 
@@ -79,7 +79,7 @@ async def create_organization_in_pipedrive(
     visible_to_str = None if visible_to_str == "" else visible_to_str
     industry = None if industry == "" else industry
 
-    pd_mcp_ctx: PipedriveMCPContext = ctx.request_context.lifespan_context
+    pd_mcp_ctx: PipedriveMCPContext = get_pipedrive_context(ctx)
 
     # Convert string IDs to integers using our utility function
     owner_id, owner_error = convert_id_string(owner_id_str, "owner_id")

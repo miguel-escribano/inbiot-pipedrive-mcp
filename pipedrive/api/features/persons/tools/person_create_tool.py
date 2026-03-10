@@ -9,7 +9,7 @@ from pipedrive.api.features.persons.models.person import Person
 from pipedrive.api.features.shared.conversion.id_conversion import convert_id_string
 from pipedrive.api.features.shared.utils import format_tool_response
 from pipedrive.api.pipedrive_api_error import PipedriveAPIError
-from pipedrive.api.pipedrive_context import PipedriveMCPContext
+from pipedrive.api.pipedrive_context import PipedriveMCPContext, get_pipedrive_context
 from pipedrive.api.features.tool_decorator import tool
 
 
@@ -92,7 +92,7 @@ async def create_person_in_pipedrive(
     visible_to_str = None if visible_to_str == "" else visible_to_str
     custom_fields_str = None if custom_fields_str == "" else custom_fields_str
 
-    pd_mcp_ctx: PipedriveMCPContext = ctx.request_context.lifespan_context
+    pd_mcp_ctx: PipedriveMCPContext = get_pipedrive_context(ctx)
 
     # Convert string IDs to integers using our utility function
     owner_id, owner_error = convert_id_string(owner_id_str, "owner_id")

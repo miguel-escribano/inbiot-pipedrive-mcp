@@ -6,7 +6,7 @@ from log_config import logger
 from pipedrive.api.features.shared.conversion.id_conversion import convert_id_string
 from pipedrive.api.features.shared.utils import format_tool_response, safe_split_to_list
 from pipedrive.api.pipedrive_api_error import PipedriveAPIError
-from pipedrive.api.pipedrive_context import PipedriveMCPContext
+from pipedrive.api.pipedrive_context import PipedriveMCPContext, get_pipedrive_context
 from pipedrive.api.features.tool_decorator import tool
 
 
@@ -60,7 +60,7 @@ async def list_organizations_from_pipedrive(
         f"updated_since='{updated_since}', updated_until='{updated_until}'"
     )
 
-    pd_mcp_ctx: PipedriveMCPContext = ctx.request_context.lifespan_context
+    pd_mcp_ctx: PipedriveMCPContext = get_pipedrive_context(ctx)
 
     # Convert string parameters to their appropriate types
     limit, limit_error = convert_id_string(limit_str, "limit")

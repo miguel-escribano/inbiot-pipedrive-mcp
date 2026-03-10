@@ -22,7 +22,7 @@ from pipedrive.api.features.shared.utils import (
     bool_to_lowercase_str
 )
 from pipedrive.api.pipedrive_api_error import PipedriveAPIError
-from pipedrive.api.pipedrive_context import PipedriveMCPContext
+from pipedrive.api.pipedrive_context import PipedriveMCPContext, get_pipedrive_context
 from pipedrive.api.features.tool_decorator import tool
 
 
@@ -152,7 +152,7 @@ async def create_activity_in_pipedrive(
     if type:
         type = type.strip()
     
-    pd_mcp_ctx: PipedriveMCPContext = ctx.request_context.lifespan_context
+    pd_mcp_ctx: PipedriveMCPContext = get_pipedrive_context(ctx)
     
     # Validate required fields
     if not subject:

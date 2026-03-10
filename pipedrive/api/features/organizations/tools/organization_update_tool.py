@@ -8,7 +8,7 @@ from pipedrive.api.features.organizations.models.organization import Organizatio
 from pipedrive.api.features.shared.conversion.id_conversion import convert_id_string
 from pipedrive.api.features.shared.utils import format_tool_response, safe_split_to_list
 from pipedrive.api.pipedrive_api_error import PipedriveAPIError
-from pipedrive.api.pipedrive_context import PipedriveMCPContext
+from pipedrive.api.pipedrive_context import PipedriveMCPContext, get_pipedrive_context
 from pipedrive.api.features.tool_decorator import tool
 
 
@@ -82,7 +82,7 @@ async def update_organization_in_pipedrive(
         logger.error(error_message)
         return format_tool_response(False, error_message=error_message)
 
-    pd_mcp_ctx: PipedriveMCPContext = ctx.request_context.lifespan_context
+    pd_mcp_ctx: PipedriveMCPContext = get_pipedrive_context(ctx)
 
     # Convert string IDs to integers using our utility function
     organization_id, id_error = convert_id_string(id_str, "organization_id")

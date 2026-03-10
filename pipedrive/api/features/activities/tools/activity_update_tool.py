@@ -20,7 +20,7 @@ from pipedrive.api.features.shared.utils import (
     sanitize_inputs
 )
 from pipedrive.api.pipedrive_api_error import PipedriveAPIError
-from pipedrive.api.pipedrive_context import PipedriveMCPContext
+from pipedrive.api.pipedrive_context import PipedriveMCPContext, get_pipedrive_context
 from pipedrive.api.features.tool_decorator import tool
 
 
@@ -144,7 +144,7 @@ async def update_activity_in_pipedrive(
     public_description = sanitized["public_description"]
     priority_str = sanitized["priority"]
     
-    pd_mcp_ctx: PipedriveMCPContext = ctx.request_context.lifespan_context
+    pd_mcp_ctx: PipedriveMCPContext = get_pipedrive_context(ctx)
     
     # Convert activity ID string to integer
     activity_id, id_error = convert_id_string(id_str, "activity_id", "123")

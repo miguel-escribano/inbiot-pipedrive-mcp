@@ -8,7 +8,7 @@ from pipedrive.api.features.deals.models.deal import Deal, VISIBILITY_PRIVATE, V
 from pipedrive.api.features.shared.conversion.id_conversion import convert_id_string, validate_date_string
 from pipedrive.api.features.shared.utils import format_tool_response, format_validation_error
 from pipedrive.api.pipedrive_api_error import PipedriveAPIError
-from pipedrive.api.pipedrive_context import PipedriveMCPContext
+from pipedrive.api.pipedrive_context import PipedriveMCPContext, get_pipedrive_context
 from pipedrive.api.features.tool_decorator import tool
 
 
@@ -98,7 +98,7 @@ async def create_deal_in_pipedrive(
     probability = None if probability == "" else probability
     lost_reason = None if lost_reason == "" else lost_reason
     
-    pd_mcp_ctx: PipedriveMCPContext = ctx.request_context.lifespan_context
+    pd_mcp_ctx: PipedriveMCPContext = get_pipedrive_context(ctx)
 
     # Validate date format
     if expected_close_date:
