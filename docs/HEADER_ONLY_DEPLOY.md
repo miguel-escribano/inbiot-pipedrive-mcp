@@ -13,3 +13,5 @@ When clients connect over HTTP/SSE (e.g. Cursor with `url` + `headers` in mcp.js
 2. **Forward headers** from the client to the Python app on every request. Nginx already has `proxy_set_header X-Pipedrive-API-Token` and `X-Pipedrive-Company-Domain` for this path. The Node SSE bridge (or whatever calls the Python app) must pass those headers through to the backend so the Python app sees them on `ctx.request_context.request.headers`.
 
 After a push to GitHub and webhook redeploy, the new logic is live. No secrets on server; client keeps them in mcp.json.
+
+For Cursor and why the server must return 200 (not 401) on the SSE endpoint, see [CURSOR-MCP-NO-OAUTH.md](CURSOR-MCP-NO-OAUTH.md).
