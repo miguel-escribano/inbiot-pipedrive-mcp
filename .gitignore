@@ -1,0 +1,23 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# environment variables
+.env
+
+**/.claude/settings.local.json
+
+# temporary files
+/tmp
+
+# pytest cache
+/.pytest_cache
+.pytest_cache
+pytest_cache
