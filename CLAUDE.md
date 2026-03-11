@@ -14,17 +14,17 @@ IMPORTANT: NEVER add Claude attribution comment blocks like "Generated with Clau
 
 ## Project Overview
 
-The mcp-concept project is a Model Control Protocol (MCP) server implementation for interacting with the Pipedrive CRM API. It provides a way for Claude to access and manipulate Pipedrive data through tool calls.
+This project (inbiot-pipedrive-mcp) is a Model Control Protocol (MCP) server for the Pipedrive CRM API. It lets Claude access and manipulate Pipedrive data through MCP tool calls.
 
 ## Environment Setup
 
-1. Create a `.env` file in the root directory with the following environment variables:
+1. Create a `.env` file in the root directory. For **local stdio/SSE** (running the server yourself):
    ```
    PIPEDRIVE_API_TOKEN=your_api_token
    PIPEDRIVE_COMPANY_DOMAIN=your_company_domain
-   HOST=0.0.0.0  # Optional, defaults to 0.0.0.0
-   PORT=8152     # Optional, defaults to 8152
-   TRANSPORT=sse  # or "stdio", defaults to "stdio"
+   HOST=127.0.0.1  # Use 127.0.0.1 for local dev; 0.0.0.0 only in containers
+   PORT=8152       # Optional, defaults to 8152
+   TRANSPORT=sse   # or "stdio", defaults to "stdio"
    
    # Feature flags (optional)
    PIPEDRIVE_FEATURE_PERSONS=true
@@ -33,6 +33,8 @@ The mcp-concept project is a Model Control Protocol (MCP) server implementation 
    PIPEDRIVE_FEATURE_LEADS=true
    PIPEDRIVE_FEATURE_ITEM_SEARCH=true
    ```
+
+2. **HTTP/SSE (remote)**: When clients connect by URL (e.g. Cursor with `url` + `headers` in mcp.json), credentials are taken **only** from request headers (`X-Pipedrive-API-Token`, `X-Pipedrive-Company-Domain`). No env fallback for those requests. See `pipedrive/api/pipedrive_context.py` and [docs/HEADER_ONLY_DEPLOY.md](docs/HEADER_ONLY_DEPLOY.md).
 
 ## Dependencies
 
@@ -53,9 +55,8 @@ any additional dependencies should be added by running `uv add <dependency_name>
 
 ### Installation
 
-To install the MCP server to Claude desktop:
+To install the MCP server to Claude desktop (from project root):
 ```bash
-cd mcp-concept
 mcp install server.py
 ```
 
@@ -141,7 +142,7 @@ pipedrive/
    - `utils.py`: Contains `format_tool_response()` for standardized JSON responses
    - `conversion/id_conversion.py`: Contains `convert_id_string()` for string-to-integer conversion
 
-10. **Pipedrive Context:** (`pipedrive/api/pipedrive_context.py`) Manages the lifecycle of the Pipedrive client.
+10. **Pipedrive Context:** (`pipedrive/api/pipedrive_context.py`) Manages the lifecycle of the Pipedrive client. Over HTTP/SSE it reads credentials only from request headers; over stdio it uses env vars. No env fallback when a request is present.
 
 ### Data Flow
 
@@ -186,7 +187,7 @@ For new features or bug fixes:
 
 When creating new features (e.g., for deals, organizations):
 
-1. **Use the custom command**: Run `/project:new-feature feature_name` to get started
+1. **Use a project command**: Run the appropriate command from `.claude/commands/` (e.g. `new-feature-prp` or `implement-pipedrive-feature`) to get started
 
 2. **Create Feature Structure:**
    ```
@@ -241,8 +242,7 @@ When creating new features (e.g., for deals, organizations):
        # Tool implementation
    ```
 
-6. **Follow Templates:**
-   Use the templates in `.claude/guides/templates.md` for consistent implementation.
+6. **Follow existing patterns:** See `.claude/guides/dev-guide.md` and feature slices under `pipedrive/api/features/` for structure.
 
 ## Shared Utilities
 
@@ -316,11 +316,12 @@ If you encounter test failures:
 
 ## Documentation and Resources
 
-- **Templates**: See `.claude/guides/templates.md` for code templates
-- **Edge Cases**: See `.claude/guides/edge-cases.md` for Pipedrive API quirks
-- **Development Guide**: See `.claude/guides/dev-guide.md` for architecture details
-- **MCP Tools**: Format docstrings with newlines between parameters for better readability, following the pattern in `ai_docs/mcp_example.md`
-- **Migration Guide**: See `MIGRATION_GUIDE.md` for details on the new feature registry system
+- **Edge cases**: `.claude/guides/edge-cases.md` — Pipedrive API quirks
+- **Development guide**: `.claude/guides/dev-guide.md` — architecture details
+- **Migration guide**: `MIGRATION_GUIDE.md` — feature registry system
+- **Deploy (header-only)**: `docs/HEADER_ONLY_DEPLOY.md` — no Pipedrive secrets on server for HTTP/SSE
+- **Cursor / no OAuth**: `docs/CURSOR-MCP-NO-OAUTH.md` — remote connection and 200 vs 401
+- **MCP tools**: Format docstrings with newlines between parameters for readability
 
 ## MCP Tool Documentation Standards
 
